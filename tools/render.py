@@ -8,6 +8,13 @@ BREAKING moved over the gap); panel subs cut to one short line at 28px;
 Trump panel rewritten (Thu trilateral + Manila->Shenzhen route arrow);
 ALSO TODAY cut 4 -> 3 items at 27px; word count ~99 -> 83.
 
+R3 final polish (see BUILD-R3.md) — no layout change, no content cut:
+hero sub-caption is now TWO 28px lines (line 2 restores "2 killed in
+Crimea" + Kyiv bridge strikes); hero foam broken into irregular clusters
+so it no longer reads as a white bar; the 11px MANILA/SHENZHEN route
+labels are removed (arrow + dots stay). Word count 83 -> 91; the
+coordinator accepted 83+ because every word is legible at 300px.
+
 Layout (1024x1024):
   masthead  0-112    "THE WORLD IN ONE DAY" + TUESDAY 17 NOVEMBER 2026
   hero img  112-372  procedural Kerch Bridge collapse scene
@@ -197,11 +204,20 @@ def draw_hero_art(d):
     d.polygon([(470, 322), (548, 330), (542, 346), (466, 338)],
               fill=ARCH_DK, outline=STEEL)
     d.polygon([(470, 322), (548, 330), (546, 334), (470, 326)], fill=ARCH)
-    # --- BIG white splash: foam band + vertical spray jets at impact ---
-    for sx, sy, rx, ry in [(512, 352, 72, 10), (468, 356, 32, 7),
-                           (556, 356, 32, 7)]:
-        d.ellipse([sx - rx, sy - ry, sx + rx, sy + ry],
-                  fill=(235, 244, 248))
+    # --- foam, broken into irregular clusters (R3): the R2 band was one
+    # continuous white bar and read as a pale stick under the fragment.
+    # Three clusters with open sea gaps between them, ragged top/bottom
+    # edges, and dimmer satellite puffs so it reads as splash foam. ---
+    foam = (235, 244, 248)
+    foam2 = (214, 232, 238)
+    for sx, sy, rx, ry in [(438, 352, 26, 8), (466, 357, 16, 7),
+                           (518, 350, 24, 8), (544, 356, 15, 6),
+                           (592, 352, 20, 8), (614, 356, 12, 6)]:
+        d.ellipse([sx - rx, sy - ry, sx + rx, sy + ry], fill=foam)
+    for sx, sy, r in [(428, 344, 6), (500, 343, 7), (560, 344, 5),
+                      (624, 348, 5), (452, 364, 5), (540, 364, 5),
+                      (600, 363, 4)]:
+        d.ellipse([sx - r, sy - r, sx + r, sy + r], fill=foam2)
     for sx, y1, y2 in [(482, 318, 342), (512, 310, 342), (542, 318, 342)]:
         d.line([(sx, y1), (sx, y2)], fill=(235, 244, 248), width=4)
     for sx, sy, r in [(480, 312, 5), (544, 308, 6), (512, 300, 5),
@@ -223,13 +239,19 @@ def draw_hero_art(d):
 
 def draw_hero_text(d):
     d.rectangle([0, 372, W, 492], fill=PAPER)
-    hf = fit_font(d, "KERCH BRIDGE COLLAPSES", SERIF_B, 58, 980)
+    # R3: headline 58 -> 50px, moved up, so the hero sub-caption fits on
+    # TWO 28px lines (band is 372-492; line 2 ink ends ~490, clear of
+    # the grid). Line 1 keeps the 19-km fact; line 2 restores the
+    # "bridge war" context + Crimea death toll lost in R2.
+    hf = fit_font(d, "KERCH BRIDGE COLLAPSES", SERIF_B, 50, 980)
     hw = d.textlength("KERCH BRIDGE COLLAPSES", font=hf)
-    d.text(((W - hw) // 2, 380), "KERCH BRIDGE COLLAPSES", font=hf, fill=INK)
-    sf = font(SANS, 26)
-    line = "19-km road arch falls into the sea; rail runs on one track."
-    lw = d.textlength(line, font=sf)
-    d.text(((W - lw) // 2, 448), line, font=sf, fill=(52, 56, 62))
+    d.text(((W - hw) // 2, 372), "KERCH BRIDGE COLLAPSES", font=hf, fill=INK)
+    sf = font(SANS, 28)
+    line1 = "19-km road arch falls into the sea; rail runs on one track."
+    line2 = "2 killed in Crimea; hours earlier, Russia hit Kyiv's bridges."
+    for ln, y in ((line1, 428), (line2, 457)):
+        lw = d.textlength(ln, font=sf)
+        d.text(((W - lw) // 2, y), ln, font=sf, fill=(52, 56, 62))
 
 
 # ---------------------------------------------------------------- panels
@@ -294,16 +316,10 @@ def icon_heads(d, cx, cy, route=False):
                    (hx + 14, cy + 2), (hx - 14, cy + 2)], fill=c)
     if route:
         # Manila -> Shenzhen route arrow under the three heads.
-        # Labels sit above the dots (clear of the heads' shoulders);
-        # dots + arrow sit below, clear of the panel sub-caption.
-        # Dots are 80px apart and labels are 11px so MANILA and
-        # SHENZHEN read as two separate labels, not one phrase.
-        lf = font(SANS_B, 11)
+        # R3: the 11px MANILA / SHENZHEN labels are REMOVED (illegible
+        # at 300px, redundant with the sub-caption); the arrow + two
+        # route dots stay, so the Manila->Shenzhen direction still reads.
         blue = (28, 64, 140)
-        d.text((cx - 56, cy + 44), "MANILA", font=lf, fill=(52, 56, 62))
-        sw = d.textlength("SHENZHEN", font=lf)
-        d.text((cx + 40 - sw // 2, cy + 44), "SHENZHEN", font=lf,
-               fill=(52, 56, 62))
         ay = cy + 62
         d.line([(cx - 34, ay), (cx + 32, ay)], fill=blue, width=4)
         d.polygon([(cx + 40, ay), (cx + 28, ay - 6), (cx + 28, ay + 6)],
